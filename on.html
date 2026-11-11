@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <title>비례ON | 비례식과 비례배분 학습실</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Noto Sans KR 폰트 -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap">
+  
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* 사용자 정의 애니메이션 & 그림자 */
+    .custom-shadow {
+      box-shadow: 0 10px 30px -5px rgba(37, 99, 235, 0.08);
+    }
+    
+    .choice-btn {
+      transition: all 0.15s ease-in-out;
+    }
+    .choice-btn:active {
+      transform: scale(0.99);
+    }
+
+    /* custom scrollbar for modal/tables */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-blue-500 selection:text-white">
+
+  <!-- 메인 헤더 & 네비게이션 -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+      <!-- 브랜딩 -->
+      <div class="flex items-center gap-3 cursor-pointer" id="brandLogo">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white font-extrabold text-xl shadow-md">
+          比
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg text-slate-800 leading-none">비례ON</h1>
+          <p class="text-xs text-slate-500 mt-0.5">초등 수학 · 비례식과 비례배분</p>
+        </div>
+      </div>
+
+      <!-- 탭 선택 -->
+      <nav class="flex bg-slate-100 p-1 rounded-xl gap-1">
+        <button id="studentTab" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-blue-600 shadow-sm">
+          학생 학습
+        </button>
+        <button id="teacherTab" class="px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition text-slate-600 hover:text-slate-900">
+          교사 관리
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 메인 콘텐츠 영역 -->
+  <main class="max-w-4xl w-full mx-auto px-4 py-6 flex-1">
+
+    <!-- 히어로 배너 -->
+    <section id="heroBanner" class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 text-white p-6 sm:p-8 mb-6 shadow-xl">
+      <div class="relative z-10">
+        <span class="inline-block px-2.5 py-1 bg-white/20 backdrop-blur-md rounded-md text-[11px] font-bold tracking-wider uppercase mb-2">
+          MATH PRACTICE · PROPORTION
+        </span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold leading-snug">
+          비와 비례의 원리,<br class="hidden sm:inline"> 문제를 풀며 완벽히 익혀봐요!
+        </h2>
+        <p class="text-xs sm:text-sm opacity-90 mt-2">
+          총 20문제 · 난이도: 하 5문 / 중 10문 / 상 5문
+        </p>
+      </div>
+      <!-- 배경 한자 장식 -->
+      <span class="absolute -right-4 -bottom-8 text-8xl font-black text-white/10 select-none pointer-events-none">
+        比例
+      </span>
+    </section>
+
+    <!-- ==================== [1] 학생 뷰 영역 ==================== -->
+    <section id="studentView" class="space-y-6">
+
+      <!-- 1-1. 이름 입력 및 시작 패널 -->
+      <div id="introPanel" class="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-7 custom-shadow">
+        <h3 class="text-xl font-bold text-slate-800 mb-1">학습 시작하기</h3>
+        <p class="text-sm text-slate-500 mb-6">
+          학생 이름을 입력하고 20문제에 도전해 보세요. 풀이 결과는 자동으로 저장됩니다.
+        </p>
+
+        <form id="startForm" onsubmit="return false;" class="flex flex-col sm:flex-row gap-3 max-w-xl">
+          <div class="flex-1">
+            <label for="studentName" class="block text-xs font-bold text-slate-700 mb-1.5">학생 이름</label>
+            <input type="text" id="studentName" placeholder="예: 김하늘" maxlength="20" required
+              class="w-full h-12 px-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+          </div>
+          <button type="button" id="startBtn" 
+            class="sm:self-end h-12 px-6 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg">
+            <span>문제 풀기</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </button>
+        </form>
+
+        <div class="flex flex-wrap gap-2 mt-6 pt-5 border-t border-slate-100">
+          <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold">📝 객관식 20문항</span>
+          <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-semibold">⚡ 실시간 자동 저장</span>
+          <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-xs font-semibold">📊 부족한 영역 분석 제공</span>
+        </div>
+      </div>
+
+      <!-- 1-2. 퀴즈 진행 패널 (기본 숨김) -->
+      <div id="quizPanel" class="hidden bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-7 custom-shadow">
+        
+        <!-- 상단 프로그레스 및 문제 정보 -->
+        <div class="flex items-center justify-between gap-4 mb-3">
+          <span id="qNumText" class="text-sm font-extrabold text-blue-600">문제 1 / 20</span>
+          <div class="flex items-center gap-2" id="qTags">
+            <span id="qCategory" class="px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded-md text-xs font-bold">카테고리</span>
+            <span id="qLevel" class="px-2.5 py-0.5 rounded-md text-xs font-bold">난이도</span>
+          </div>
+        </div>
+
+        <!-- 진행률 바 -->
+        <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-6">
+          <div id="progressBar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300 w-0"></div>
+        </div>
+
+        <!-- 문제 바로가기 인디케이터 (네비게이션) -->
+        <div id="questionNavGrid" class="flex flex-wrap gap-1.5 mb-6 pb-4 border-b border-slate-100">
+          <!-- JS로 20개 버튼 생성 -->
+        </div>
+
+        <!-- 질문 본문 -->
+        <div class="mb-6">
+          <h4 id="qPrompt" class="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed whitespace-pre-line min-h-[60px]">
+            문제가 로딩 중입니다...
+          </h4>
+        </div>
+
+        <!-- 보기 (Choices) -->
+        <div id="choiceContainer" class="space-y-2.5 mb-8">
+          <!-- JS로 생성 -->
+        </div>
+
+        <!-- 하단 네비게이션 버튼 -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+          <button id="prevBtn" class="px-4 py-2.5 border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold rounded-xl text-sm transition disabled:opacity-40 disabled:cursor-not-allowed">
+            ← 이전
+          </button>
+          
+          <span id="answeredCount" class="text-xs font-medium text-slate-400">
+            풀이 완료: 0 / 20
+          </span>
+
+          <button id="nextBtn" disabled class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white font-bold rounded-xl text-sm transition disabled:text-slate-400 disabled:cursor-not-allowed">
+            다음 문제 →
+          </button>
+        </div>
+      </div>
+
+      <!-- 1-3. 성적 결과 패널 (기본 숨김) -->
+      <div id="resultPanel" class="hidden bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-7 custom-shadow">
+        <!-- JS로 동적 생성 -->
+      </div>
+
+    </section>
+
+    <!-- ==================== [2] 교사 뷰 영역 (기본 숨김) ==================== -->
+    <section id="teacherView" class="hidden space-y-6">
+      
+      <!-- 2-1. 교사 인증 비밀번호 입력 -->
+      <div id="teacherAuth" class="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-7 custom-shadow">
+        <h3 class="text-xl font-bold text-slate-800 mb-1">교사 전용 결과 확인</h3>
+        <p class="text-sm text-slate-500 mb-6">
+          학생들의 평가 제출 현황을 확인하려면 교사 비밀번호를 입력해 주세요.
+        </p>
+
+        <form id="authForm" onsubmit="return false;" class="flex flex-col sm:flex-row gap-3 max-w-sm">
+          <div class="flex-1">
+            <input type="password" id="teacherPassword" inputmode="numeric" maxlength="4" placeholder="비밀번호 4자리 입력"
+              class="w-full h-12 px-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm tracking-widest text-center font-bold">
+          </div>
+          <button type="button" id="unlockTeacherBtn" 
+            class="h-12 px-6 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition">
+            확인
+          </button>
+        </form>
+        <p id="authError" class="text-xs text-red-500 font-semibold mt-2 hidden">비밀번호가 일치하지 않습니다.</p>
+      </div>
+
+      <!-- 2-2. 교사 전용 대시보드 (인증 후 표시) -->
+      <div id="teacherContent" class="hidden bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-7 custom-shadow">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-xl font-bold text-slate-800">학생 평가 결과 리스트</h3>
+            <p class="text-xs text-slate-500 mt-1">이 브라우저(Local Storage)에 기록된 모든 학생 제출 데이터입니다.</p>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <button id="downloadCsvBtn" class="px-3 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold rounded-lg text-xs transition">
+              📥 JSON 저장
+            </button>
+            <button id="clearResultsBtn" class="px-3 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold rounded-lg text-xs transition">
+              🗑️ 전체 삭제
+            </button>
+            <button id="lockTeacherBtn" class="px-3 py-2 bg-slate-100 text-slate-600 hover:bg-slate-200 font-bold rounded-lg text-xs transition">
+              🔒 잠그기
+            </button>
+          </div>
+        </div>
+
+        <!-- 제출 현황 데이터 테이블 -->
+        <div id="teacherTableContainer" class="overflow-x-auto">
+          <!-- JS dynamic table -->
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- 푸터 -->
+  <footer class="border-t border-slate-200 bg-white py-6 mt-12 text-center text-xs text-slate-400">
+    <p>© 비례ON · 초등학교 6학년 수학 비례식과 비례배분 학습 솔루션</p>
+  </footer>
+
+  <!-- 토스트 알림 메시지 UI -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 translate-y-8 opacity-0 pointer-events-none transition-all duration-300 bg-slate-900 text-white px-5 py-2.5 rounded-xl shadow-2xl text-xs sm:text-sm font-semibold z-50 flex items-center gap-2">
+    <span id="toastMessage">메시지 내용</span>
+  </div>
+
+  <!-- 커스텀 모달 (학생 오답 확인 / 데이터 삭제 확인 등) -->
+  <div id="customModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-200">
+    <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden transform scale-95 transition-transform duration-200" id="modalCard">
+      <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+        <h4 id="modalTitle" class="font-bold text-slate-800 text-base sm:text-lg">상세 내역</h4>
+        <button id="closeModalBtn" class="text-slate-400 hover:text-slate-600 font-bold text-xl p-1">✕</button>
+      </div>
+      <div id="modalBody" class="p-5 overflow-y-auto space-y-4 text-sm text-slate-700 flex-1">
+        <!-- 모달 내용 -->
+      </div>
+      <div id="modalFooter" class="p-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-2">
+        <button id="modalConfirmBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-lg transition">
+          확인
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 스크립트 엔진 -->
+  <script>
+    // ==========================================
+    // 1. 문제 데이터 세트 (총 20문항)
+    // ==========================================
+    const questions = [
+      { c: '비의 구조', l: '하', p: '비 3:5에서 전항과 후항을 바르게 짝지은 것은?', o: ['전항 3, 후항 5', '전항 5, 후항 3', '전항 3, 후항 8', '전항 8, 후항 5'], a: 0, e: '비 a:b에서 기호 앞에 있는 a는 전항, 뒤에 있는 b는 후항입니다.' },
+      { c: '비의 구조', l: '하', p: '사과 4개와 배 7개의 수를 [사과 수 : 배 수]로 나타낸 비는?', o: ['7:4', '4:7', '4:11', '11:7'], a: 1, e: '앞에 놓인 수(사과 4개)가 전항, 뒤에 놓인 수(배 7개)가 후항이므로 4:7입니다.' },
+      { c: '비의 성질', l: '하', p: '비 2:3의 전항과 후항에 각각 2를 곱해도 비의 값이 같은 알맞은 비는?', o: ['4:6', '4:5', '2:6', '6:3'], a: 0, e: '비의 전항과 후항에 0이 아닌 같은 수를 곱하면 비의 값은 같습니다. (2×2 : 3×2 = 4:6)' },
+      { c: '비례식의 개념', l: '하', p: '다음 중 비율이 같은 두 비를 등호(=)를 사용하여 나타낸 식(비례식)은?', o: ['2:3', '2+3=5', '2:3=4:6', '2×3'], a: 2, e: '비의 값이 같은 두 비를 등호(=)로 나타낸 식이 바로 비례식입니다.' },
+      { c: '비례식의 구조', l: '하', p: '비례식 2:3=4:6에서 바깥쪽에 있는 항인 "외항"은 무엇인가요?', o: ['3과 4', '2와 6', '2와 4', '3과 6'], a: 1, e: '비례식 a:b=c:d에서 바깥쪽의 2와 6을 외항, 안쪽의 3과 4를 내항이라고 합니다.' },
+      { c: '비례식의 구조', l: '중', p: '비례식 5:8=15:24에서 안쪽에 위치한 항인 "내항"을 고르세요.', o: ['5와 24', '8과 15', '5와 15', '8과 24'], a: 1, e: '비례식에서 안쪽에 위치한 두 항(8, 15)이 내항입니다.' },
+      { c: '비의 성질', l: '중', p: '비 18:24를 가장 간단한 자연수의 비로 나타내세요.', o: ['2:3', '3:4', '4:3', '6:8'], a: 1, e: '전항 18과 후항 24를 두 수의 최대공약수인 6으로 나누면 3:4가 됩니다.' },
+      { c: '비의 성질', l: '중', p: '비 4:7의 전항에 3을 더하고 후항에도 3을 더한 비(7:10)는 원래 비와 값이 같나요?', o: ['항상 같다', '같지 않다', '전항이 0일 때만 같다', '후항이 0일 때만 같다'], a: 1, e: '비의 성질은 전항과 후항에 같은 수를 곱하거나 나눌 때 성립하며, 더하거나 뺄 때는 성립하지 않습니다.' },
+      { c: '비례식의 개념', l: '중', p: '다음 보기 중 올바르게 성립하는 비례식을 고르세요.', o: ['6:9 = 2:3', '6:9 = 2:4', '6:9 > 2:3', '6+9 = 2+3'], a: 0, e: '6:9의 비의 값(6/9 = 2/3)과 2:3의 비의 값(2/3)이 서로 같으므로 올바른 비례식입니다.' },
+      { c: '비례식의 성질', l: '중', p: '비례식 3:4=9:12에서 [외항의 곱]과 [내항의 곱]은 각각 얼마인가요?', o: ['외항 36, 내항 36', '외항 27, 내항 48', '외항 15, 내항 16', '외항 12, 내항 9'], a: 0, e: '외항의 곱(3 × 12 = 36)과 내항의 곱(4 × 9 = 36)은 항상 서로 같습니다.' },
+      { c: '비례식의 성질', l: '중', p: '비례식  x : 5 = 12 : 15 를 만족하는 알맞은 미지수 x의 값은?', o: ['3', '4', '5', '6'], a: 1, e: '외항의 곱(15 × x) = 내항의 곱(5 × 12 = 60)이므로 15x = 60 → x = 4입니다.' },
+      { c: '비례식의 성질', l: '중', p: '비례식  7 : x = 21 : 30 일 때 x의 값은 얼마인가요?', o: ['8', '10', '12', '14'], a: 1, e: '외항의 곱(7 × 30 = 210) = 내항의 곱(21 × x)이므로 21x = 210 → x = 10입니다.' },
+      { c: '비례식의 성질', l: '중', p: '비례식  3 : 8 = x : 40 일 때 x의 값을 구하세요.', o: ['12', '15', '18', '20'], a: 1, e: '외항의 곱(3 × 40 = 120) = 내항의 곱(8 × x)이므로 8x = 120 → x = 15입니다.' },
+      { c: '비례식 문장제', l: '중', p: '축척 지도에서 2cm가 실제 거리 6km를 나타냅니다. 지도에서 5cm인 두 지점 사이의 실제 거리는 몇 km일까요?', o: ['12km', '15km', '18km', '20km'], a: 1, e: '지도 거리 : 실제 거리 = 2 : 6 = 5 : x. (2x = 30 → x = 15km)' },
+      { c: '비례배분 계산', l: '중', p: '숫자 42를 2:5로 비례배분할 때 더 작은 몫은 얼마인가요?', o: ['10', '12', '14', '30'], a: 1, e: '전체 42 × (2 / 2+5) = 42 × (2/7) = 12 입니다.' },
+      { c: '비례배분 계산', l: '상', p: '96을 3:5로 비례배분한 두 수의 차이는 얼마인가요?', o: ['12', '18', '24', '36'], a: 2, e: '두 수 = 96 × (3/8) = 36, 96 × (5/8) = 60. 두 수의 차 = 60 - 36 = 24 입니다.' },
+      { c: '비례배분 응용', l: '상', p: '둘레가 72cm인 직사각형이 있습니다. 가로와 세로의 길이의 비가 5:4일 때, 가로의 길이는 몇 cm인가요?', o: ['20cm', '30cm', '40cm', '45cm'], a: 0, e: '가로 + 세로 = 둘레의 절반(72 ÷ 2 = 36cm). 가로의 길이 = 36 × (5 / 5+4) = 36 × (5/9) = 20cm.' },
+      { c: '비례배분 문장제', l: '상', p: '민수와 지우가 상금 54,000원을 4:5의 비율로 나눕니다. 지우가 받게 되는 금액은 얼마인가요?', o: ['24,000원', '27,000원', '30,000원', '36,000원'], a: 2, e: '지우의 비율 = 5. 받는 금액 = 54,000 × (5 / 4+5) = 54,000 × (5/9) = 30,000원.' },
+      { c: '비례식 문장제', l: '상', p: '일정한 속도로 3시간 동안 210km를 달리는 자동차가 있습니다. 같은 속도로 5시간 동안 가는 거리는 몇 km일까요?', o: ['300km', '330km', '350km', '370km'], a: 2, e: '시간 : 거리 = 3 : 210 = 5 : x. (3x = 1050 → x = 350km)' },
+      { c: '비례배분 문장제', l: '상', p: '물감 420mL를 파란색과 흰색 비율 2:5로 섞으려고 합니다. 필요한 흰색 물감의 양은 몇 mL인가요?', o: ['120mL', '240mL', '300mL', '350mL'], a: 2, e: '흰색 물감 양 = 420 × (5 / 2+5) = 420 × (5/7) = 300mL 입니다.' }
+    ];
+
+    // ==========================================
+    // 2. 상태 관리 변수
+    // ==========================================
+    const $ = selector => document.querySelector(selector);
+    const $$ = selector => document.querySelectorAll(selector);
+
+    let currentStudent = { name: '', startTime: null };
+    let studentAnswers = Array(questions.length).fill(null);
+    let currentIndex = 0;
+    let isTeacherUnlocked = false;
+
+    // LocalStorage Key
+    const STORAGE_KEY = 'proportionQuizResults_v2';
+
+    // Helper: HTML ESCAPE
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>"']/g, c => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[c]));
+    }
+
+    // Storage 읽기/쓰기
+    function getStoredRecords() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+    function saveRecords(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    // ==========================================
+    // 3. UI 토스트 & 커스텀 모달
+    // ==========================================
+    function showToast(msg) {
+      const toast = $('#toast');
+      const toastMsg = $('#toastMessage');
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
+      }, 2200);
+    }
+
+    function openModal(title, contentHtml, onConfirm = null) {
+      $('#modalTitle').textContent = title;
+      $('#modalBody').innerHTML = contentHtml;
+      
+      const modal = $('#customModal');
+      const card = $('#modalCard');
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        card.classList.remove('scale-95');
+      }, 10);
+
+      const confirmBtn = $('#modalConfirmBtn');
+      confirmBtn.onclick = () => {
+        if (onConfirm) onConfirm();
+        closeModal();
+      };
+    }
+
+    function closeModal() {
+      const modal = $('#customModal');
+      const card = $('#modalCard');
+      modal.classList.add('opacity-0');
+      card.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 200);
+    }
+
+    $('#closeModalBtn').onclick = closeModal;
+
+    // ==========================================
+    // 4. 탭 전환 관리
+    // ==========================================
+    function switchTab(tabName) {
+      const isTeacher = tabName === 'teacher';
+      
+      // 탭 스타일
+      if (isTeacher) {
+        $('#teacherTab').className = "px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-blue-600 shadow-sm";
+        $('#studentTab').className = "px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition text-slate-600 hover:text-slate-900";
+        $('#studentView').classList.add('hidden');
+        $('#teacherView').classList.remove('hidden');
+
+        if (!isTeacherUnlocked) {
+          $('#teacherAuth').classList.remove('hidden');
+          $('#teacherContent').classList.add('hidden');
+        } else {
+          renderTeacherDashboard();
+        }
+      } else {
+        $('#studentTab').className = "px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition bg-white text-blue-600 shadow-sm";
+        $('#teacherTab').className = "px-3 py-1.5 text-xs sm:text-sm font-bold rounded-lg transition text-slate-600 hover:text-slate-900";
+        $('#teacherView').classList.add('hidden');
+        $('#studentView').classList.remove('hidden');
+      }
+    }
+
+    $('#studentTab').onclick = () => switchTab('student');
+    $('#teacherTab').onclick = () => switchTab('teacher');
+    $('#brandLogo').onclick = () => switchTab('student');
+
+    // ==========================================
+    // 5. 학생 풀이 로직
+    // ==========================================
+    $('#startBtn').onclick = startQuiz;
+    $('#studentName').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') startQuiz();
+    });
+
+    function startQuiz() {
+      const name = $('#studentName').value.trim();
+      if (!name) {
+        showToast('학생 이름을 입력해 주세요!');
+        $('#studentName').focus();
+        return;
+      }
+
+      currentStudent = { name, startTime: new Date() };
+      studentAnswers = Array(questions.length).fill(null);
+      currentIndex = 0;
+
+      // 뷰 전환
+      $('#introPanel').classList.add('hidden');
+      $('#resultPanel').classList.add('hidden');
+      $('#quizPanel').classList.remove('hidden');
+
+      renderQuestionNav();
+      renderCurrentQuestion();
+    }
+
+    // 상단 20개 문항 인디케이터 생성
+    function renderQuestionNav() {
+      const navContainer = $('#questionNavGrid');
+      navContainer.innerHTML = '';
+
+      questions.forEach((_, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition flex items-center justify-center border`;
+        btn.textContent = idx + 1;
+        btn.onclick = () => {
+          currentIndex = idx;
+          renderCurrentQuestion();
+        };
+        navContainer.appendChild(btn);
+      });
+    }
+
+    // 인디케이터 상태 갱신
+    function updateNavGrid() {
+      const buttons = $('#questionNavGrid').children;
+      Array.from(buttons).forEach((btn, i) => {
+        const isAnswered = studentAnswers[i] !== null;
+        const isCurrent = i === currentIndex;
+
+        if (isCurrent) {
+          btn.className = `w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-extrabold transition flex items-center justify-center border-2 border-blue-600 bg-blue-50 text-blue-700 shadow-sm`;
+        } else if (isAnswered) {
+          btn.className = `w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition flex items-center justify-center border border-slate-300 bg-slate-700 text-white`;
+        } else {
+          btn.className = `w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-xs font-bold transition flex items-center justify-center border border-slate-200 bg-white text-slate-500 hover:bg-slate-50`;
+        }
+      });
+    }
+
+    // 문항 렌더링
+    function renderCurrentQuestion() {
+      const q = questions[currentIndex];
+
+      // 헤더 정보
+      $('#qNumText').textContent = `문제 ${currentIndex + 1} / ${questions.length}`;
+      $('#qCategory').textContent = q.c;
+      
+      const levelBadge = $('#qLevel');
+      levelBadge.textContent = `난이도: ${q.l}`;
+      if (q.l === '하') levelBadge.className = 'px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-md text-xs font-bold';
+      else if (q.l === '중') levelBadge.className = 'px-2.5 py-0.5 bg-amber-100 text-amber-800 rounded-md text-xs font-bold';
+      else levelBadge.className = 'px-2.5 py-0.5 bg-rose-100 text-rose-800 rounded-md text-xs font-bold';
+
+      // 프로그레스 바
+      const progressPercent = ((currentIndex + 1) / questions.length) * 100;
+      $('#progressBar').style.width = `${progressPercent}%`;
+
+      // 프롬프트
+      $('#qPrompt').textContent = q.p;
+
+      // 보기 생성
+      const container = $('#choiceContainer');
+      container.innerHTML = '';
+
+      q.o.forEach((optText, optIdx) => {
+        const selected = studentAnswers[currentIndex] === optIdx;
+        const btn = document.createElement('button');
+        btn.className = `choice-btn w-full text-left p-3.5 sm:p-4 rounded-xl border flex items-center gap-3 transition min-h-[48px] ${
+          selected 
+            ? 'border-blue-600 bg-blue-50/80 text-blue-900 font-bold shadow-sm ring-2 ring-blue-500/20' 
+            : 'border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-medium'
+        }`;
+
+        const circleNum = String.fromCharCode(9312 + optIdx); // ①, ② ...
+        btn.innerHTML = `
+          <span class="w-6 h-6 rounded-full flex items-center justify-center text-sm ${selected ? 'bg-blue-600 text-white font-bold' : 'bg-slate-100 text-slate-500'}">
+            ${optIdx + 1}
+          </span>
+          <span class="text-sm sm:text-base leading-snug flex-1">${escapeHtml(optText)}</span>
+        `;
+
+        btn.onclick = () => selectChoice(optIdx);
+        container.appendChild(btn);
+      });
+
+      // 하단 네비게이션 상태
+      const answeredTotal = studentAnswers.filter(a => a !== null).length;
+      $('#answeredCount').textContent = `풀이 완료: ${answeredTotal} / ${questions.length}`;
+
+      $('#prevBtn').disabled = currentIndex === 0;
+
+      const nextBtn = $('#nextBtn');
+      nextBtn.disabled = studentAnswers[currentIndex] === null;
+
+      if (currentIndex === questions.length - 1) {
+        nextBtn.textContent = '제출 및 결과 보기 🎉';
+        nextBtn.className = 'px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 text-white font-bold rounded-xl text-sm transition disabled:text-slate-400 disabled:cursor-not-allowed shadow-md';
+      } else {
+        nextBtn.textContent = '다음 문제 →';
+        nextBtn.className = 'px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-200 text-white font-bold rounded-xl text-sm transition disabled:text-slate-400 disabled:cursor-not-allowed';
+      }
+
+      updateNavGrid();
+    }
+
+    function selectChoice(optIndex) {
+      studentAnswers[currentIndex] = optIndex;
+      renderCurrentQuestion();
+    }
+
+    // 이전/다음 버튼 이벤트
+    $('#prevBtn').onclick = () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCurrentQuestion();
+      }
+    };
+
+    $('#nextBtn').onclick = () => {
+      if (studentAnswers[currentIndex] === null) return;
+
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderCurrentQuestion();
+      } else {
+        // 마지막 문제 제출
+        submitQuiz();
+      }
+    };
+
+    // 퀴즈 제출 및 평가
+    function submitQuiz() {
+      // 안 푼 문제가 있는지 확인
+      const uncompleted = studentAnswers.findIndex(a => a === null);
+      if (uncompleted !== -1) {
+        openModal(
+          '미완료 문제 알림',
+          `<p class="py-2">아직 풀지 않은 문제가 있습니다. <strong>${uncompleted + 1}번 문제</strong>로 이동할까요?</p>`,
+          () => {
+            currentIndex = uncompleted;
+            renderCurrentQuestion();
+          }
+        );
+        return;
+      }
+
+      // 채점 계산
+      let score = 0;
+      const topicMissMap = {};
+
+      questions.forEach((q, idx) => {
+        const userAns = studentAnswers[idx];
+        if (userAns === q.a) {
+          score++;
+        } else {
+          topicMissMap[q.c] = (topicMissMap[q.c] || 0) + 1;
+        }
+      });
+
+      // 취약 영역 정리
+      const weakTopics = Object.entries(topicMissMap)
+        .sort((a, b) => b[1] - a[1])
+        .map(([topic, count]) => ({ topic, count }));
+
+      const endTime = new Date();
+      const timeSpentSec = Math.round((endTime - currentStudent.startTime) / 1000);
+      const minutes = Math.floor(timeSpentSec / 60);
+      const seconds = timeSpentSec % 60;
+      const timeFormatted = minutes > 0 ? `${minutes}분 ${seconds}초` : `${seconds}초`;
+
+      const resultRecord = {
+        id: Date.now(),
+        name: currentStudent.name,
+        score: score,
+        total: questions.length,
+        percentage: Math.round((score / questions.length) * 100),
+        date: new Date().toLocaleString('ko-KR'),
+        timeSpent: timeFormatted,
+        weakTopics: weakTopics,
+        answers: [...studentAnswers]
+      };
+
+      // 저장
+      const records = getStoredRecords();
+      records.unshift(resultRecord);
+      saveRecords(records);
+
+      // 화면 전환
+      $('#quizPanel').classList.add('hidden');
+      $('#resultPanel').classList.remove('hidden');
+      renderResultScreen(resultRecord);
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // 결과 화면 Render
+    function renderResultScreen(record) {
+      const isPerfect = record.score === record.total;
+
+      let weakTopicsHtml = '';
+      if (record.weakTopics.length > 0) {
+        weakTopicsHtml = `
+          <div class="mt-6">
+            <h4 class="font-bold text-slate-800 text-sm mb-3">🎯 집중 복습이 필요한 영역</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              ${record.weakTopics.map(w => `
+                <div class="p-3 bg-amber-50/80 border border-amber-200/60 rounded-xl flex items-center justify-between">
+                  <span class="text-xs font-bold text-amber-900">${escapeHtml(w.topic)}</span>
+                  <span class="text-xs px-2 py-0.5 bg-amber-200/70 text-amber-900 rounded-md font-bold">${w.count}문항 틀림</span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        weakTopicsHtml = `
+          <div class="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs sm:text-sm font-semibold flex items-center gap-2">
+            <span>🎉</span> 모든 영역의 개념을 완벽하게 이해하고 있습니다!
+          </div>
+        `;
+      }
+
+      // 오답 노트 생성
+      const reviewItemsHtml = questions.map((q, idx) => {
+        const userAns = record.answers[idx];
+        const isCorrect = userAns === q.a;
+
+        return `
+          <div class="p-4 rounded-xl border ${isCorrect ? 'border-slate-100 bg-slate-50/50' : 'border-rose-200 bg-rose-50/30'} space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <span class="font-bold text-xs ${isCorrect ? 'text-emerald-600 bg-emerald-100' : 'text-rose-600 bg-rose-100'} px-2 py-0.5 rounded-md">
+                ${idx + 1}번 ${isCorrect ? '정답' : '오답'}
+              </span>
+              <span class="text-[11px] text-slate-400">${q.c} · 난이도: ${q.l}</span>
+            </div>
+
+            <p class="font-bold text-slate-800 text-sm sm:text-base">${escapeHtml(q.p)}</p>
+
+            <div class="text-xs space-y-1 pt-1">
+              <p class="${isCorrect ? 'text-emerald-700 font-semibold' : 'text-rose-700 font-bold'}">
+                선택한 답: ${userAns !== null ? escapeHtml(q.o[userAns]) : '미응답'}
+              </p>
+              ${!isCorrect ? `<p class="text-emerald-700 font-bold">정답: ${escapeHtml(q.o[q.a])}</p>` : ''}
+            </div>
+
+            ${!isCorrect ? `
+              <div class="mt-2 p-2.5 bg-white border border-rose-100 rounded-lg text-xs text-slate-600 leading-relaxed">
+                <strong class="text-slate-800">💡 해설:</strong> ${escapeHtml(q.e)}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+
+      $('#resultPanel').innerHTML = `
+        <div class="text-center pb-6 border-b border-slate-100">
+          <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 font-bold text-xs rounded-full mb-2">
+            학습 완료 리포트
+          </span>
+          <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800">${escapeHtml(record.name)} 학생</h3>
+          <p class="text-xs text-slate-400 mt-1">제출 일시: ${escapeHtml(record.date)} (${record.timeSpent})</p>
+
+          <div class="mt-5 inline-flex items-baseline gap-1 bg-gradient-to-tr from-blue-50 to-indigo-50 px-8 py-4 rounded-2xl border border-blue-100">
+            <span class="text-5xl font-black text-blue-600 tracking-tight">${record.score}</span>
+            <span class="text-lg font-bold text-slate-400">/ ${record.total}점</span>
+          </div>
+
+          <p class="text-sm font-bold text-slate-700 mt-3">
+            ${isPerfect ? '💯 완벽합니다! 20문제를 모두 맞혔습니다!' : `수고했어요! ${record.score}문제를 맞혔습니다. 아래 해설을 읽어보세요.`}
+          </p>
+        </div>
+
+        ${weakTopicsHtml}
+
+        <div class="mt-8">
+          <h4 class="font-bold text-slate-800 text-sm mb-4 flex items-center justify-between">
+            <span>📋 전체 문항 확인 및 해설</span>
+          </h4>
+          <div class="space-y-3">
+            ${reviewItemsHtml}
+          </div>
+        </div>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 flex justify-center">
+          <button id="restartBtn" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition text-sm shadow-md">
+            🔄 처음으로 돌아가기
+          </button>
+        </div>
+      `;
+
+      $('#restartBtn').onclick = () => {
+        $('#resultPanel').classList.add('hidden');
+        $('#introPanel').classList.remove('hidden');
+        $('#studentName').value = '';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+    }
+
+    // ==========================================
+    // 6. 교사 관리자 기능
+    // ==========================================
+    $('#unlockTeacherBtn').onclick = unlockTeacher;
+    $('#teacherPassword').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') unlockTeacher();
+    });
+
+    function unlockTeacher() {
+      const inputPass = $('#teacherPassword').value.trim();
+      if (inputPass === '1120') {
+        isTeacherUnlocked = true;
+        $('#authError').classList.add('hidden');
+        $('#teacherAuth').classList.add('hidden');
+        $('#teacherContent').classList.remove('hidden');
+        renderTeacherDashboard();
+      } else {
+        $('#authError').classList.remove('hidden');
+      }
+    }
+
+    $('#lockTeacherBtn').onclick = () => {
+      isTeacherUnlocked = false;
+      $('#teacherPassword').value = '';
+      $('#teacherContent').classList.add('hidden');
+      $('#teacherAuth').classList.remove('hidden');
+    };
+
+    function renderTeacherDashboard() {
+      const records = getStoredRecords();
+      const container = $('#teacherTableContainer');
+
+      if (records.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12 text-slate-400">
+            <p class="text-4xl mb-2">📥</p>
+            <p class="text-sm font-medium">아직 제출된 학생 학습 결과가 없습니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const tableHtml = `
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 border-b border-slate-200">
+              <th class="py-3 px-3 font-bold">학생 이름</th>
+              <th class="py-3 px-3 font-bold">점수</th>
+              <th class="py-3 px-3 font-bold">백분율</th>
+              <th class="py-3 px-3 font-bold">취약 영역</th>
+              <th class="py-3 px-3 font-bold">제출 일시</th>
+              <th class="py-3 px-3 font-bold text-right">상세보기</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            ${records.map(r => `
+              <tr class="hover:bg-slate-50/80 transition">
+                <td class="py-3 px-3 font-bold text-slate-800">${escapeHtml(r.name)}</td>
+                <td class="py-3 px-3">
+                  <span class="font-extrabold ${r.score >= 16 ? 'text-emerald-600' : r.score >= 12 ? 'text-amber-600' : 'text-rose-600'}">
+                    ${r.score}
+                  </span> / 20점
+                </td>
+                <td class="py-3 px-3 text-slate-600">${r.percentage}%</td>
+                <td class="py-3 px-3 text-slate-600">
+                  ${r.weakTopics.length > 0 
+                    ? r.weakTopics.map(w => `<span class="inline-block bg-amber-50 text-amber-800 px-1.5 py-0.5 rounded text-[11px] font-semibold mr-1 mb-1">${escapeHtml(w.topic)} (${w.count})</span>`).join('')
+                    : '<span class="text-emerald-600 font-bold">없음 (만점)</span>'
+                  }
+                </td>
+                <td class="py-3 px-3 text-slate-400 text-xs">${escapeHtml(r.date)}</td>
+                <td class="py-3 px-3 text-right">
+                  <button data-record-id="${r.id}" class="view-detail-btn px-2.5 py-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold rounded-md text-xs transition">
+                    상세보기
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+
+      container.innerHTML = tableHtml;
+
+      // 상세보기 버튼 이벤트 바인딩
+      $$('.view-detail-btn').forEach(btn => {
+        btn.onclick = () => {
+          const recId = Number(btn.getAttribute('data-record-id'));
+          const rec = records.find(item => item.id === recId);
+          if (rec) showStudentDetailModal(rec);
+        };
+      });
+    }
+
+    // 학생 개별 상세보기 모달
+    function showStudentDetailModal(rec) {
+      const missedList = rec.answers
+        .map((ans, idx) => ans === questions[idx].a ? null : { qIdx: idx, q: questions[idx], ans })
+        .filter(Boolean);
+
+      let bodyHtml = `
+        <div class="space-y-4">
+          <div class="p-3 bg-slate-50 rounded-xl flex flex-wrap gap-4 text-xs font-semibold">
+            <div>학생: <span class="font-bold text-slate-900">${escapeHtml(rec.name)}</span></div>
+            <div>점수: <span class="font-bold text-blue-600">${rec.score}/20 (${rec.percentage}점)</span></div>
+            <div>소요시간: <span class="text-slate-700">${rec.timeSpent || '기록 없음'}</span></div>
+          </div>
+
+          <h5 class="font-bold text-slate-800 text-sm">❌ 오답 문항 상세 분석 (${missedList.length}개)</h5>
+      `;
+
+      if (missedList.length === 0) {
+        bodyHtml += `<div class="text-center py-6 text-emerald-600 font-bold">틀린 문제가 없습니다! 완벽합니다. 🎉</div>`;
+      } else {
+        bodyHtml += `<div class="space-y-3">`;
+        missedList.forEach(m => {
+          bodyHtml += `
+            <div class="p-3 border border-rose-100 bg-rose-50/20 rounded-xl space-y-1.5 text-xs">
+              <div class="flex justify-between font-bold text-slate-700">
+                <span>${m.qIdx + 1}번 문제 (${m.q.c})</span>
+                <span class="text-rose-600">오답</span>
+              </div>
+              <p class="font-medium text-slate-800">${escapeHtml(m.q.p)}</p>
+              <div class="pt-1 text-slate-600">
+                <span class="text-rose-600">학생 제출: ${m.ans !== null ? escapeHtml(m.q.o[m.ans]) : '미응답'}</span> / 
+                <span class="text-emerald-600 font-bold">정답: ${escapeHtml(m.q.o[m.q.a])}</span>
+              </div>
+              <p class="text-slate-500 bg-white p-2 rounded border border-slate-100 text-[11px] leading-relaxed">
+                💡 ${escapeHtml(m.q.e)}
+              </p>
+            </div>
+          `;
+        });
+        bodyHtml += `</div>`;
+      }
+
+      bodyHtml += `</div>`;
+
+      openModal(`${rec.name} 학생 오답 노트`, bodyHtml);
+    }
+
+    // 결과 데이터 전체 삭제
+    $('#clearResultsBtn').onclick = () => {
+      openModal(
+        '결과 전체 삭제',
+        '<p class="py-2 text-rose-600 font-bold">저장된 모든 학생의 평가 기록을 삭제하시겠습니까? 이 작업은 복구할 수 없습니다.</p>',
+        () => {
+          saveRecords([]);
+          renderTeacherDashboard();
+          showToast('모든 학생 결과가 삭제되었습니다.');
+        }
+      );
+    };
+
+    // 데이터 JSON으로 내보내기
+    $('#downloadCsvBtn').onclick = () => {
+      const records = getStoredRecords();
+      if (records.length === 0) {
+        showToast('내보낼 데이터가 없습니다.');
+        return;
+      }
+
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(records, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `비례ON_학습결과_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('결과 데이터가 JSON 파일로 다운로드되었습니다.');
+    };
+  </script>
+</body>
+</html>
